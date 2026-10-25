@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Нога паука: эскиз механизма</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#EEF1F4; --grid:#D7DDE4; --grid-major:#C3CBD5;
+  --graphite:#2B2F36; --muted:#5E6570;
+  --ink:#1F4FA3; --trace:#B0287A; --spring:#2E7D6B; --ground:#8A9099;
+  --panel:#FFFFFF; --edge:#CDD3DA;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#171A1F; --grid:#232830; --grid-major:#2E3540;
+    --graphite:#D6DAE0; --muted:#98A0AB;
+    --ink:#86AEFF; --trace:#FF7EC3; --spring:#5CC7A8; --ground:#6B727C;
+    --panel:#1E2228; --edge:#2F353E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#171A1F; --grid:#232830; --grid-major:#2E3540;
+  --graphite:#D6DAE0; --muted:#98A0AB;
+  --ink:#86AEFF; --trace:#FF7EC3; --spring:#5CC7A8; --ground:#6B727C;
+  --panel:#1E2228; --edge:#2F353E;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0; background:var(--paper); color:var(--graphite);
+  font-family:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  font-size:16px; line-height:1.5;
+}
+main{max-width:1180px; margin:0 auto; padding:24px 20px 40px}
+h1{font-size:1.6rem; font-weight:700; margin:0 0 4px; letter-spacing:-0.01em}
+.lede{color:var(--muted); margin:0 0 20px; max-width:70ch}
+.layout{display:grid; grid-template-columns:minmax(0,1fr) 320px; gap:20px; align-items:start}
+@media (max-width:860px){.layout{grid-template-columns:1fr}}
+.sheet{
+  border:1px solid var(--edge); border-radius:6px; overflow:hidden;
+  background:var(--paper);
+}
+svg{display:block; width:100%; height:auto; max-width:100%}
+.panel{
+  background:var(--panel); border:1px solid var(--edge); border-radius:6px;
+  padding:18px;
+}
+.modes{display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-bottom:18px}
+.modes button{
+  font:inherit; font-weight:500; padding:10px 8px; border-radius:4px;
+  border:1px solid var(--edge); background:transparent; color:var(--graphite);
+  cursor:pointer;
+}
+.modes button[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:var(--panel)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--trace); outline-offset:2px}
+.ctrl{margin-bottom:16px}
+.ctrl label{display:flex; justify-content:space-between; font-weight:500; margin-bottom:4px}
+.ctrl output{font-variant-numeric:tabular-nums; color:var(--ink)}
+input[type=range]{width:100%; accent-color:var(--ink)}
+.check{display:flex; gap:8px; align-items:center; margin-bottom:16px}
+dl{margin:0; display:grid; grid-template-columns:1fr auto; gap:6px 12px; border-top:1px solid var(--edge); padding-top:14px}
+dt{color:var(--muted)}
+dd{margin:0; font-variant-numeric:tabular-nums; font-weight:500; text-align:right}
+.note{margin:14px 0 0; font-size:0.94rem; color:var(--muted)}
+.hidden{display:none}
+.legend{display:flex; flex-wrap:wrap; gap:14px; padding:10px 14px; font-size:0.9rem; color:var(--muted); border-top:1px solid var(--edge)}
+.legend span::before{content:""; display:inline-block; width:18px; height:3px; vertical-align:middle; margin-right:6px; background:currentColor}
+.l-ink{color:var(--ink)} .l-trace{color:var(--trace)} .l-spring{color:var(--spring)}
+.legend span{color:var(--muted)}
+.legend .l-ink::before{background:var(--ink)} .legend .l-trace::before{background:var(--trace)} .legend .l-spring::before{background:var(--spring)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+  <h1>Нога паука: эскиз механизма</h1>
+  <p class="lede" id="lede"></p>
+
+  <div class="layout">
+    <div class="sheet">
+      <svg id="svg" viewBox="0 0 800 520" role="img" aria-label="Схема ноги"></svg>
+      <div class="legend">
+        <span class="l-ink">звенья ноги</span>
+        <span class="l-trace">путь стопы</span>
+        <span class="l-spring">тяга / пружина</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="modes" role="group" aria-label="Механизм">
+        <button id="mStep" aria-pressed="true">Шаг сверху</button>
+        <button id="mPar" aria-pressed="false">Параллелограмм</button>
+        <button id="mTilt" aria-pressed="false">Наклон</button>
+      </div>
+
+      <section id="pStep">
+        <div class="ctrl">
+          <label for="stepA">Угол шага <output id="stepOut"></output></label>
+          <input id="stepA" type="range" min="-20" max="20" step="0.25" value="-20">
+        </div>
+        <div class="ctrl">
+          <label for="tiltA">Наклон ноги <output id="tiltOut"></output></label>
+          <input id="tiltA" type="range" min="0" max="25" step="0.25" value="0">
+        </div>
+        <label class="check"><input id="compOn2" type="checkbox" checked> Тяга подключена</label>
+        <label class="check"><input id="play" type="checkbox"> Показать цикл шага</label>
+        <dl>
+          <dt>Уход стопы вбок от прямой</dt><dd id="stLat"></dd>
+          <dt>Подъём стопы</dt><dd id="stLift"></dd>
+          <dt>Голень отклонена наружу</dt><dd id="stDelta"></dd>
+          <dt>Шаг за полный размах</dt><dd>59 мм</dd>
+        </dl>
+        <p class="note">Большая картинка — вид сверху, корпус слева. Мотор шага поворачивает ногу, тяга (зелёная) раскрывает колено к краям шага, и стопа идёт по прямой. Во вставке — вид сбоку: наклон клонит ногу вперёд, стопа отрывается от пола. Размеры из step_linkage_optimizer.py.</p>
+      </section>
+
+      <section id="pPar">
+        <div class="ctrl">
+          <label for="theta">Подъём бедра <output id="thetaOut"></output></label>
+          <input id="theta" type="range" min="18.7" max="50" step="0.1" value="18.7">
+        </div>
+        <label class="check"><input id="traceOn" type="checkbox" checked> Показать путь стопы</label>
+        <dl>
+          <dt>Высота стопы над полом</dt><dd id="parZ"></dd>
+          <dt>Вынос стопы от оси бедра</dt><dd id="parX"></dd>
+          <dt>Смещение стопы внутрь при подъёме</dt><dd id="parDx"></dd>
+          <dt>Угол голени к вертикали</dt><dd>0° всегда</dd>
+        </dl>
+        <p class="note">Плечо нагрузки мотора бедра равно выносу стопы: чем он меньше, тем легче мотору. Голень остаётся вертикальной сама, без третьего мотора, но стопа при подъёме уезжает к корпусу по дуге.</p>
+      </section>
+
+      <section id="pTilt" class="hidden">
+        <div class="ctrl">
+          <label for="h">Высота центра поворота <output id="hOut"></output></label>
+          <input id="h" type="range" min="0.15" max="0.6" step="0.01" value="0.3">
+        </div>
+        <div class="ctrl">
+          <label for="alpha">Угол наклона <output id="alphaOut"></output></label>
+          <input id="alpha" type="range" min="-45" max="45" step="0.5" value="20">
+        </div>
+        <dl>
+          <dt>Подъём стопы</dt><dd id="tZ"></dd>
+          <dt>Смещение стопы вбок</dt><dd id="tX"></dd>
+          <dt>Подъём при смещении на 10 см</dt><dd id="t10"></dd>
+          <dt>Плечо нагрузки при опоре</dt><dd id="tLever"></dd>
+        </dl>
+        <p class="note">Подъём растёт как квадрат угла, и в середине дуги стопа в самой нижней точке. Чем выше центр поворота, тем меньше подъём при том же смещении вбок. Зато вертикальная нога под центром работает как колонна: плечо ноль, мотору держать нечего.</p>
+      </section>
+    </div>
+  </div>
+</main>
+<script>
+
+(function(){
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("svg");
+  // Мир в метрах -> пиксели
+  let S = 700, X0 = 230, Z0 = 470;             // 1 м = 700 px; начало координат
+  const px = x => X0 + x*S, pz = z => Z0 - z*S;
+  const deg = r => r*180/Math.PI, rad = d => d*Math.PI/180;
+  const cm = m => (m*100).toFixed(1) + " см";
+
+  function el(tag, attrs, parent){
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    (parent||svg).appendChild(e); return e;
+  }
+  function line(a,b,cls,w,dash){
+    return el("line",{x1:px(a[0]),y1:pz(a[1]),x2:px(b[0]),y2:pz(b[1]),
+      stroke:`var(${cls})`,"stroke-width":w||3,"stroke-linecap":"round",
+      "stroke-dasharray":dash||""});
+  }
+  function dot(p,r,cls,fill){
+    return el("circle",{cx:px(p[0]),cy:pz(p[1]),r:r||5,
+      fill:fill?`var(${cls})`:"var(--paper)",stroke:`var(${cls})`,"stroke-width":2});
+  }
+  function text(p,s,cls,anchor){
+    const t = el("text",{x:px(p[0]),y:pz(p[1]),fill:`var(${cls||"--muted"})`,
+      "font-size":13,"text-anchor":anchor||"start",
+      "font-family":"Archivo, system-ui, sans-serif"});
+    t.textContent = s; return t;
+  }
+  function poly(pts,cls,w,dash){
+    return el("polyline",{points:pts.map(p=>px(p[0])+","+pz(p[1])).join(" "),
+      fill:"none",stroke:`var(${cls})`,"stroke-width":w||2,"stroke-dasharray":dash||"",
+      "stroke-linejoin":"round"});
+  }
+  function spring(a,b,coils){
+    // зигзаг от a до b
+    const n = coils||8, dx=b[0]-a[0], dz=b[1]-a[1], L=Math.hypot(dx,dz);
+    const ux=dx/L, uz=dz/L, nx=-uz, nz=ux, amp=0.008, pts=[a];
+    const lead = 0.12;
+    pts.push([a[0]+ux*L*lead, a[1]+uz*L*lead]);
+    for(let i=1;i<=n*2;i++){
+      const t = lead + (1-2*lead)*i/(n*2+1), s = (i%2?1:-1)*amp;
+      pts.push([a[0]+ux*L*t+nx*s, a[1]+uz*L*t+nz*s]);
+    }
+    pts.push([a[0]+ux*L*(1-lead), a[1]+uz*L*(1-lead)]); pts.push(b);
+    poly(pts,"--spring",2);
+  }
+  function grid(step, every){
+    step = step||0.05; every = every||4;
+    const xmin=(0-X0)/S, xmax=(800-X0)/S, zmin=(Z0-520)/S, zmax=Z0/S;
+    for(let i=Math.ceil(xmin/step); i*step<=xmax; i++)
+      line([i*step,zmin],[i*step,zmax], i%every===0?"--grid-major":"--grid",1);
+    for(let i=Math.ceil(zmin/step); i*step<=zmax; i++)
+      line([xmin,i*step],[xmax,i*step], i%every===0?"--grid-major":"--grid",1);
+  }
+  function ground(){
+    const xmin=(0-X0)/S, xmax=(800-X0)/S, t=18/S;
+    line([xmin,0],[xmax,0],"--ground",2);
+    for(let x=xmin; x<xmax; x+=t*1.4) line([x,0],[x-t*0.8,-t*0.8],"--ground",1);
+  }
+
+  // ---------- Параллелограмм ----------
+  const P1=[0,0.12], P2=[0,0.07], L2=0.25, L3=0.20;
+  function parFoot(th){
+    const u=[Math.cos(th),Math.sin(th)];
+    return [P1[0]+L2*u[0], P1[1]+L2*u[1]-L3];
+  }
+  function drawPar(){
+    const th = rad(+thetaIn.value);
+    const u=[Math.cos(th),Math.sin(th)];
+    const K1=[P1[0]+L2*u[0],P1[1]+L2*u[1]], K2=[P2[0]+L2*u[0],P2[1]+L2*u[1]];
+    const F=[K1[0],K1[1]-L3];
+    // корпус
+    el("rect",{x:px(-0.26),y:pz(0.17),width:0.26*S,height:0.13*S,rx:6,
+      fill:"var(--panel)",stroke:"var(--graphite)","stroke-width":2});
+    text([-0.245,0.145],"корпус","--muted");
+    // путь стопы
+    if(traceOn.checked){
+      const pts=[]; for(let d=18.7; d<=50; d+=0.5) pts.push(parFoot(rad(d)));
+      poly(pts,"--trace",2,"6 5");
+    }
+    // пружина: от верхней точки на корпусе к нижнему звену
+    const A=[-0.05,0.24], B=[P2[0]+0.09*u[0],P2[1]+0.09*u[1]];
+    spring(A,B,7); dot(A,4,"--spring",true);
+    // звенья параллелограмма
+    line(P1,K1,"--ink",5); line(P2,K2,"--ink",3);
+    line([K1[0],K1[1]+0.01],[K2[0],K2[1]-0.005],"--ink",6);
+    line(K1,F,"--ink",5);
+    dot(P1,6,"--ink"); dot(P2,5,"--ink"); dot(K1,5,"--ink"); dot(K2,5,"--ink");
+    dot(F,6,"--trace",true);
+    text([P1[0]+0.01,P1[1]+0.025],"мотор бедра","--ink");
+    // размер: вынос стопы
+    const y=-0.045;
+    line([0,y],[F[0],y],"--muted",1); line([0,y-0.01],[0,y+0.01],"--muted",1);
+    line([F[0],y-0.01],[F[0],y+0.01],"--muted",1);
+    text([F[0]/2,y-0.022],"вынос "+cm(F[0]),"--muted","middle");
+    // readouts
+    const F0 = parFoot(rad(18.7));
+    thetaOut.textContent = (+thetaIn.value).toFixed(1)+"°";
+    parZ.textContent = cm(Math.max(0,F[1]));
+    parX.textContent = cm(F[0]);
+    parDx.textContent = cm(F0[0]-F[0]);
+  }
+
+  // ---------- Наклон ----------
+  const PX=0.25;
+  function drawTilt(){
+    const h=+hIn.value, a=rad(+aIn.value);
+    const C=[PX,h], F=[PX+h*Math.sin(a), h-h*Math.cos(a)];
+    // кронштейн
+    el("rect",{x:px(PX-0.09),y:pz(h+0.05),width:0.18*S,height:0.04*S,rx:4,
+      fill:"var(--panel)",stroke:"var(--graphite)","stroke-width":2});
+    text([PX-0.08,h+0.065],"корпус","--muted");
+    // дуга пути
+    const pts=[]; for(let d=-45; d<=45; d+=1){const r=rad(d); pts.push([PX+h*Math.sin(r),h-h*Math.cos(r)]);}
+    poly(pts,"--trace",2,"6 5");
+    // вертикаль под центром
+    line(C,[PX,0],"--grid-major",1,"3 4");
+    line(C,F,"--ink",6); dot(C,7,"--ink"); dot(F,6,"--trace",true);
+    text([PX+0.015,h+0.012],"центр поворота","--ink");
+    // подъём
+    if(F[1]>0.003){
+      line([F[0]+0.02,0],[F[0]+0.02,F[1]],"--muted",1);
+      text([F[0]+0.03,F[1]/2],"подъём "+cm(F[1]),"--muted");
+    }
+    hOut.textContent = cm(h);
+    aOut.textContent = (+aIn.value).toFixed(1)+"°";
+    tZ.textContent = cm(F[1]);
+    tX.textContent = cm(Math.abs(F[0]-PX));
+    t10.textContent = h>0.1 ? cm(h-Math.sqrt(h*h-0.01)) : "—";
+    tLever.textContent = cm(Math.abs(h*Math.sin(a)));
+  }
+
+  // ---------- Шаг вокруг вертикальной оси (результат step_linkage_optimizer.py) ----------
+  const SG={H:0.10, thigh:0.09, up:rad(25), lever:0.03999932914854963,
+            lam:rad(-101.20959131785519), rod:0.03504498763364193,
+            B:[0,0.015123659847682606,0.02372328892073247]};
+  SG.K=[0, SG.thigh*Math.cos(SG.up), SG.thigh*Math.sin(SG.up)];
+  SG.shin=SG.K[2]+SG.H;
+  const Rz=a=>[[Math.cos(a),-Math.sin(a),0],[Math.sin(a),Math.cos(a),0],[0,0,1]];
+  const Rt=a=>[[Math.cos(a),0,-Math.sin(a)],[0,1,0],[Math.sin(a),0,Math.cos(a)]];
+  const mm3=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,v,k)=>s+v*B[k][j],0)));
+  const mv=(A,v)=>A.map(r=>r[0]*v[0]+r[1]*v[1]+r[2]*v[2]);
+  const tr=A=>A[0].map((_,j)=>A.map(r=>r[j]));
+  const wrap=a=>((a+Math.PI)%(2*Math.PI)+2*Math.PI)%(2*Math.PI)-Math.PI;
+  function sgCands(step,tilt){
+    const R=mm3(Rz(step),Rt(tilt)), Bl=mv(tr(R),SG.B);
+    const D=[SG.K[0]-Bl[0],SG.K[1]-Bl[1],SG.K[2]-Bl[2]];
+    const q=(SG.rod*SG.rod-(D[0]*D[0]+D[1]*D[1]+D[2]*D[2])-SG.lever*SG.lever)/(2*SG.lever);
+    const s=q/Math.hypot(D[1],D[2]); if(Math.abs(s)>1) return null;
+    const th=Math.atan2(D[2],D[1]);
+    return [wrap(th+Math.asin(s)-SG.lam), wrap(th+Math.PI-Math.asin(s)-SG.lam)];
+  }
+  const c0=sgCands(0,0); SG.branch=Math.abs(c0[0])<Math.abs(c0[1])?0:1;
+  function sgPose(step,tilt,comp){
+    let d=0;
+    if(comp){ const c=sgCands(step,tilt); d=c?c[SG.branch]:0; }
+    const R=mm3(Rz(step),Rt(tilt));
+    const F=[0, SG.K[1]+SG.shin*Math.sin(d), SG.K[2]-SG.shin*Math.cos(d)];
+    const a=d+SG.lam;
+    const P=[0, SG.K[1]+SG.lever*Math.sin(a), SG.K[2]-SG.lever*Math.cos(a)];
+    return {d, K:mv(R,SG.K), F:mv(R,F), P:mv(R,P)};
+  }
+  let trail=[];
+  function drawStep(){
+    const step=rad(+stIn.value), tilt=rad(+tlIn.value), comp=compOn2.checked;
+    // Вид сверху: экран вправо = Y (наружу), экран вверх = X (вперёд)
+    const T=p=>[p[1], p[0]];
+    el("rect",{x:px(-0.06),y:pz(0.085),width:0.06*S,height:0.17*S,rx:8,
+      fill:"var(--panel)",stroke:"var(--graphite)","stroke-width":2});
+    text([-0.055,0.07],"корпус","--muted");
+    text([-0.055,0.06],"↑ вперёд","--muted");
+    // пути стопы в опоре: без тяги (дуга) и с тягой
+    const arc=[], lineP=[];
+    for(let g=-20; g<=20.001; g+=0.5){
+      arc.push(T(sgPose(rad(g),0,false).F)); lineP.push(T(sgPose(rad(g),0,true).F));
+    }
+    poly(comp?arc:lineP,"--grid-major",2,"4 4");
+    poly(comp?lineP:arc,"--trace",2.5,"6 5");
+    const p=sgPose(step,tilt,comp);
+    if(playing){ trail.push(T(p.F)); if(trail.length>160) trail.shift(); poly(trail,"--trace",1.5,""); }
+    // тяга и нога
+    if(comp){ line(T(SG.B),T(p.P),"--spring",3); dot(T(SG.B),5,"--spring",true); }
+    line([0,0],T(p.K),"--ink",6);
+    line(T(p.K),T(p.F),"--ink",4);
+    line(T(p.K),T(p.P),"--ink",3);
+    dot([0,0],8,"--ink"); dot(T(p.K),6,"--ink"); dot(T(p.F),6,"--trace",true);
+    text([0.004,0.012],"моторы шага и наклона","--ink");
+    if(comp) text([SG.B[1]-0.004,SG.B[0]-0.012],"B на корпусе","--spring","end");
+    // вставка: вид сбоку (X вперёд вправо, Z вверх)
+    const ix=560, iy=24, iw=220, ih=190, sc=1100;
+    const ox=ix+iw/2, oy=iy+50;
+    const sp=v=>[ox+v[0]*sc, oy-v[2]*sc];
+    el("rect",{x:ix,y:iy,width:iw,height:ih,rx:4,fill:"var(--panel)",stroke:"var(--edge)"});
+    const tt=el("text",{x:ix+10,y:iy+18,fill:"var(--graphite)","font-size":12,
+      "font-family":"Archivo, system-ui, sans-serif"}); tt.textContent="вид сбоку, наклон";
+    const gy=oy+SG.H*sc;
+    el("line",{x1:ix+8,y1:gy,x2:ix+iw-8,y2:gy,stroke:"var(--ground)","stroke-width":2});
+    const a=sp([0,0,0]), k=sp(p.K), f=sp(p.F);
+    el("line",{x1:a[0],y1:a[1],x2:k[0],y2:k[1],stroke:"var(--ink)","stroke-width":4,"stroke-linecap":"round"});
+    el("line",{x1:k[0],y1:k[1],x2:f[0],y2:f[1],stroke:"var(--ink)","stroke-width":3,"stroke-linecap":"round"});
+    el("circle",{cx:a[0],cy:a[1],r:5,fill:"var(--paper)",stroke:"var(--ink)","stroke-width":2});
+    el("circle",{cx:f[0],cy:f[1],r:4,fill:"var(--trace)"});
+    const lb=el("text",{x:ix+10,y:iy+ih-8,fill:"var(--muted)","font-size":11}); lb.textContent="→ вперёд";
+    // readouts
+    const y0=SG.K[1];
+    stOut.textContent=(+stIn.value).toFixed(1)+"°";
+    tlOut.textContent=(+tlIn.value).toFixed(1)+"°";
+    const pl=sgPose(step,0,comp);
+    stLat.textContent=((pl.F[1]-y0)*1000).toFixed(2)+" мм";
+    stLift.textContent=((p.F[2]+SG.H)*1000).toFixed(1)+" мм";
+    stDelta.textContent=deg(p.d).toFixed(1)+"°";
+  }
+
+  // ---------- управление ----------
+  const $ = id => document.getElementById(id);
+  const thetaIn=$("theta"), traceOn=$("traceOn"), hIn=$("h"), aIn=$("alpha");
+  const thetaOut=$("thetaOut"), hOut=$("hOut"), aOut=$("alphaOut");
+  const parZ=$("parZ"), parX=$("parX"), parDx=$("parDx");
+  const tZ=$("tZ"), tX=$("tX"), t10=$("t10"), tLever=$("tLever");
+  const stIn=$("stepA"), tlIn=$("tiltA"), compOn2=$("compOn2"), play=$("play");
+  const stOut=$("stepOut"), tlOut=$("tiltOut"), stLat=$("stLat"), stLift=$("stLift"), stDelta=$("stDelta");
+  let mode="step", playing=false, anim=null;
+  const LEDE={
+    step:"Шаг вокруг вертикальной оси, тяга колена и наклон для переноса. Клетка сетки 1 см.",
+    par:"Вид сбоку, в плоскости ноги. Клетка сетки 5 см.",
+    tilt:"Вид в плоскости наклона. Клетка сетки 5 см."};
+
+  function render(){
+    while(svg.firstChild) svg.removeChild(svg.firstChild);
+    if(mode==="step"){ S=3000; X0=200; Z0=270; grid(0.01,5); drawStep(); return; }
+    S=700; X0=230; Z0=470; grid(0.05,4); ground();
+    if(mode==="par") drawPar(); else drawTilt();
+  }
+  function setMode(m){
+    mode=m;
+    for(const [id,k] of [["mStep","step"],["mPar","par"],["mTilt","tilt"]])
+      $(id).setAttribute("aria-pressed", m===k);
+    $("pStep").classList.toggle("hidden", m!=="step");
+    $("pPar").classList.toggle("hidden", m!=="par");
+    $("pTilt").classList.toggle("hidden", m!=="tilt");
+    $("lede").textContent=LEDE[m];
+    render();
+  }
+  $("mStep").onclick=()=>setMode("step");
+  $("mPar").onclick=()=>setMode("par");
+  $("mTilt").onclick=()=>setMode("tilt");
+  [thetaIn,traceOn,hIn,aIn,stIn,tlIn,compOn2].forEach(i=>i.addEventListener("input",()=>{trail=[];render();}));
+  // Цикл шага: опора — нога идёт назад по земле; перенос — наклон вперёд и возврат
+  play.addEventListener("change",()=>{
+    playing=play.checked; trail=[];
+    if(!playing){ if(anim) cancelAnimationFrame(anim); render(); return; }
+    const t0=performance.now(), T=2.4;
+    const tick=t=>{
+      if(!playing) return;
+      const ph=((t-t0)/1000/T)%1;
+      let st, tl;
+      if(ph<0.5){ st=-20+80*ph; tl=0; }
+      else { const u=(ph-0.5)/0.5, e=0.5-0.5*Math.cos(Math.PI*u);
+             st=20-40*e; tl=25*Math.sin(Math.PI*u); }
+      stIn.value=st.toFixed(2); tlIn.value=tl.toFixed(2);
+      if(mode==="step") render();
+      anim=requestAnimationFrame(tick);
+    };
+    anim=requestAnimationFrame(tick);
+  });
+  setMode("step");
+})();
+</script>
+</body>
+</html>

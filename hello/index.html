@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Привет, я Владимир</title>
+<meta name="description" content="Кто я и какого шагающего робота-паука я делаю.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f5; --surface: #ffffff; --text: #1f1d1a; --muted: #6b665e;
+    --border: #e7e2da; --accent: #c2410c; --accent-soft: #fdeee6;
+    --ink: #1f4fa3; --rod: #2e7d6b; --ground: #8a9099;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151413; --surface: #1e1c1a; --text: #ece8e2; --muted: #a09a91;
+      --border: #2f2c28; --accent: #fb923c; --accent-soft: #2a1d14;
+      --ink: #86aeff; --rod: #5cc7a8; --ground: #6b727c;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 400 17px/1.65 "Inter", system-ui, -apple-system, sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 56px 20px 80px; }
+  a { color: var(--accent); }
+  .back { font-size: 14px; text-decoration: none; color: var(--muted); }
+  .kicker { display: inline-block; margin-top: 28px; font-size: 13px; font-weight: 600;
+    letter-spacing: .06em; text-transform: uppercase; color: var(--accent);
+    background: var(--accent-soft); padding: 4px 10px; border-radius: 999px; }
+  h1, h2, h3 { font-family: "Lora", Georgia, serif; line-height: 1.2; }
+  h1 { font-size: clamp(34px, 7vw, 50px); margin: 14px 0 12px; }
+  h2 { font-size: 26px; margin: 52px 0 12px; }
+  h3 { font-size: 19px; margin: 0 0 6px; }
+  .lead { font-size: 19px; color: var(--muted); margin: 0; }
+  figure { margin: 24px 0; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 16px; }
+  figure img, figure svg { display: block; width: 100%; height: auto; }
+  figure svg { max-width: 420px; margin: 0 auto; }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 10px; }
+  .png { background: #fff; border-radius: 8px; }
+  .steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; counter-reset: s; }
+  .steps li { background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 16px 14px 56px; position: relative; }
+  .steps li::before { counter-increment: s; content: counter(s); position: absolute; left: 16px; top: 14px;
+    width: 26px; height: 26px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    font-weight: 600; font-size: 14px; display: grid; place-items: center; }
+  .steps p { margin: 0; color: var(--muted); font-size: 16px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+  .stat b { display: block; font-family: "Lora", Georgia, serif; font-size: 26px; }
+  .stat span { color: var(--muted); font-size: 14px; }
+  .sketch { display: block; width: 100%; height: 640px; border: 0; border-radius: 10px; }
+  .btn { display: inline-block; margin-top: 10px; padding: 8px 14px; border-radius: 999px;
+    background: var(--accent); color: #fff; text-decoration: none; font-weight: 500; font-size: 15px; }
+  svg text { font-family: "Inter", system-ui, sans-serif; fill: var(--text); font-size: 13px; }
+  svg .muted { fill: var(--muted); }
+  footer { margin-top: 56px; color: var(--muted); font-size: 14px; }
+  @media (max-width: 520px) { .wrap { padding-top: 32px; } .sketch { height: 560px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← Все заметки</a>
+  <span class="kicker">Знакомство</span>
+  <h1>Привет, я Владимир 👋</h1>
+  <p class="lead">Инженер и программист. В свободное время делаю шагающего робота-паука: шесть ног, 3D-принтер и много расчётов. Здесь рассказываю, как он устроен и к чему я пришёл.</p>
+
+  <h2>Что за паук</h2>
+  <p>Цель — шагающий паук, который со временем станет быстрым, «чувствующим» и автономным. Иду маленькими шагами: сейчас это небольшой шестиногий робот на дешёвых сервах MG90S с бюджетом около $50. Всё сначала проверяю в физическом симуляторе MuJoCo, потом печатаю.</p>
+  <p>Главная идея: <strong>на каждую ногу всего два мотора</strong>, а колено двигается само, его ведёт тяга. За счёт этого стоя моторы вообще не держат вес, его держит конструкция.</p>
+
+  <h2>Как устроена нога</h2>
+  <figure>
+    <svg viewBox="0 0 420 430" role="img" aria-label="Схема ноги, вид спереди">
+      <!-- пол -->
+      <line x1="0" y1="400" x2="420" y2="400" stroke="var(--ground)" stroke-width="2" stroke-dasharray="6 5"/>
+      <text x="330" y="420" class="muted">пол</text>
+      <!-- корпус -->
+      <rect x="0" y="110" width="66" height="80" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
+      <text x="8" y="215" class="muted">корпус</text>
+      <!-- бедро -->
+      <line x1="75" y1="150" x2="279" y2="55" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/>
+      <!-- голень -->
+      <line x1="279" y1="55" x2="279" y2="400" stroke="var(--ink)" stroke-width="7" stroke-linecap="round"/>
+      <!-- рычаг над коленом -->
+      <line x1="279" y1="55" x2="181" y2="36" stroke="var(--text)" stroke-width="3" stroke-linecap="round"/>
+      <!-- тяга B-P -->
+      <line x1="113" y1="91" x2="181" y2="36" stroke="var(--rod)" stroke-width="3" stroke-dasharray="7 5"/>
+      <circle cx="113" cy="91" r="6" fill="var(--rod)"/>
+      <circle cx="181" cy="36" r="5" fill="var(--text)"/>
+      <!-- шарниры -->
+      <rect x="66" y="141" width="18" height="18" rx="3" fill="var(--text)"/>
+      <circle cx="279" cy="55" r="7" fill="var(--bg)" stroke="var(--text)" stroke-width="3"/>
+      <circle cx="279" cy="400" r="7" fill="var(--accent)"/>
+      <!-- подписи -->
+      <text x="92" y="182">2 мотора:</text>
+      <text x="92" y="199" class="muted">шаг и наклон</text>
+      <text x="292" y="60">колено</text>
+      <text x="292" y="77" class="muted">без мотора</text>
+      <text x="168" y="118" transform="rotate(-25 168 118)">бедро 90 мм</text>
+      <text x="292" y="240">голень</text>
+      <text x="292" y="257" class="muted">138 мм, отвесно</text>
+      <text x="292" y="385">стопа</text>
+      <text x="120" y="22" fill="var(--rod)" style="fill:var(--rod)">тяга с пружиной</text>
+      <text x="96" y="110" class="muted">B</text>
+      <text x="186" y="30" class="muted">P</text>
+    </svg>
+    <figcaption>Нога спереди. Тяга B–P крепится к корпусу и раскрывает колено, когда нога поворачивается.</figcaption>
+  </figure>
+
+  <ol class="steps">
+    <li><h3>Мотор шага</h3><p>Вертикальная ось: поворачивает ногу вперёд-назад. Сам по себе он вёл бы стопу по дуге.</p></li>
+    <li><h3>Тяга вместо мотора в колене</h3><p>К краям шага тяга раскрывает колено, и стопа уходит чуть дальше от корпуса. В итоге сверху стопа идёт почти по прямой.</p></li>
+    <li><h3>Мотор наклона</h3><p>Горизонтальная ось вдоль ноги: наклоняет ногу как маятник, стопа идёт по дуге и отрывается от пола.</p></li>
+    <li><h3>Пружина в тяге</h3><p>Тяга пружинит: стопа мягче, удары гасятся, допуски печати почти не влияют.</p></li>
+  </ol>
+
+  <h2>Зачем тяга: расчёт</h2>
+  <p>Размеры тяги я подобрал оптимизатором. Без неё стопа на краях шага уходит вбок почти на 5 мм, с ней — на десятые доли миллиметра.</p>
+  <figure>
+    <img class="png" src="linkage.png" alt="Графики: путь стопы сверху, отклонение стопы от прямой с тягой и без, вид ноги спереди" loading="lazy">
+    <figcaption>Слева путь стопы сверху, в центре отклонение от прямой (серым — без тяги), справа нога спереди, зелёным тяга.</figcaption>
+  </figure>
+
+  <div class="stats">
+    <div class="stat"><b>0,1 мм</b><span>уход стопы вбок вместо 4,9 мм</span></div>
+    <div class="stat"><b>59 мм</b><span>длина шага при повороте ±20°</span></div>
+    <div class="stat"><b>10 см/с</b><span>скорость в симуляции (без тяг 8,6)</span></div>
+    <div class="stat"><b>0 Н·м</b><span>нагрузка на моторы, когда паук стоит</span></div>
+  </div>
+
+  <h2>Покрути сам</h2>
+  <p>Интерактивный эскиз ноги: можно двигать ползунки и смотреть, как ведёт себя механизм.</p>
+  <figure>
+    <iframe class="sketch" src="leg-sketch.html" title="Интерактивный эскиз ноги" loading="lazy"></iframe>
+    <a class="btn" href="leg-sketch.html">Открыть на весь экран</a>
+  </figure>
+
+  <h2>Как я к этому пришёл</h2>
+  <ol class="steps">
+    <li><h3>Четвероногий на сервах</h3><p>Учебная модель одной ноги с обратной кинематикой. Для учёбы годится, но медленно и без обратной связи.</p></li>
+    <li><h3>Поиск приводов</h3><p>Шаговые моторы отбросил. На будущее присмотрел бесколлекторные приводы с планетаркой (QDD), а пока остаюсь на сервах.</p></li>
+    <li><h3>Схема ноги</h3><p>Перебрал параллелограмм и маятник, пока не пришёл к двум моторам и пассивному колену с тягой.</p></li>
+    <li><h3>Симуляция и CAD</h3><p>Шестиногий паук ходит в MuJoCo походкой тройкой. Детали рисую кодом в build123d.</p></li>
+    <li><h3>Мини-паук на соленоидах</h3><p>Отдельная забава: по соленоиду на сустав, дёргано, но просто.</p></li>
+  </ol>
+
+  <footer>Схемы и расчёты — из моих обсуждений проекта с Claude. Октябрь 2026.</footer>
+</div>
+</body>
+</html>
