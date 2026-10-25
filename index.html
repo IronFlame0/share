@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Заметки для друзей</title>
+<meta name="description" content="Пересказы, идеи и инструкции, которыми я делюсь с друзьями.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f5;
+    --surface: #ffffff;
+    --text: #1f1d1a;
+    --muted: #6b665e;
+    --border: #e7e2da;
+    --accent: #c2410c;
+    --accent-soft: #fdeee6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #151413;
+      --surface: #1e1c1a;
+      --text: #ece8e2;
+      --muted: #a09a91;
+      --border: #2f2c28;
+      --accent: #fb923c;
+      --accent-soft: #2a1d14;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 400 17px/1.6 "Inter", system-ui, -apple-system, sans-serif;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 64px 20px 80px; }
+  header { margin-bottom: 40px; }
+  .kicker {
+    display: inline-block;
+    font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 4px 10px; border-radius: 999px;
+  }
+  h1 {
+    font-family: "Lora", Georgia, serif; font-weight: 700;
+    font-size: clamp(32px, 6vw, 46px); line-height: 1.15;
+    margin: 16px 0 12px;
+  }
+  .lead { color: var(--muted); margin: 0; font-size: 18px; }
+  ul.pages { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+  ul.pages a {
+    display: block; text-decoration: none; color: inherit;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 18px 20px; transition: border-color .15s, transform .15s;
+  }
+  ul.pages a:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .title { font-family: "Lora", Georgia, serif; font-weight: 600; font-size: 20px; line-height: 1.3; }
+  .meta { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .desc { margin-top: 6px; }
+  .empty {
+    border: 1px dashed var(--border); border-radius: 14px;
+    padding: 32px 20px; text-align: center; color: var(--muted);
+  }
+  ul.pages:not(:empty) + .empty { display: none; }
+  footer { margin-top: 56px; color: var(--muted); font-size: 14px; }
+  @media (max-width: 480px) { .wrap { padding-top: 40px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="kicker">Для друзей</span>
+    <h1>Заметки, идеи и инструкции</h1>
+    <p class="lead">Пересказы, мысли и пошаговые инструкции, которыми я делюсь. Новые страницы появляются сверху.</p>
+  </header>
+
+  <main>
+    <!-- Новые страницы добавлять в начало списка в формате:
+    <li><a href="slug/"><div class="title">Название</div><div class="meta">25 октября 2026</div><div class="desc">Одна строка описания.</div></a></li>
+    -->
+    <ul class="pages"></ul>
+    <div class="empty">Пока здесь пусто. Скоро появится первая страница.</div>
+  </main>
+
+  <footer>Опубликовано через GitHub Pages</footer>
+</div>
+</body>
+</html>
